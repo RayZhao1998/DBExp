@@ -1,0 +1,207 @@
+{% extends "base.html" %}
+
+{% block body %}
+<div class="new-blog-form">
+    <h2>修改文章</h2>
+    <div class="form-group">
+        <label for="exampleFormControlInput1">文章标题</label>
+        <input type="text" class="form-control" id="title-input" placeholder="标题" value="{{blog[1]}}">
+    </div>
+    <div class="form-group">
+        <label for="exampleFormControlInput2">文章正文</label>
+        <textarea class="form-control" id="content-input">{{blog[3]}}</textarea>
+    </div>
+    <div class="form-group">
+        <label>文章分类</label>
+        <div class="categories-div">
+            <div class="categories-btn-div">
+            {% for category in categories %}
+                <button id="category-{{category[0]}}" class="btn btn-outline-primary" onclick="chooseCategory({{category[0]}})">{{category[1]}}</button>
+            {% endfor %}
+            </div>
+            <div style="margin-left: 6px;">
+                <button id="add-category-btn" class="btn btn-outline-primary" onclick="addCategory()">+</button>
+                <div id="add-category-form-div" style="display: none">
+                    <input id="category-input" class="form-control mb-2" style="width: 100px; display: inline">
+                    <div id="not-login-in-div" class="btn-group">
+                        <button id="cancel-category-btn" class="btn btn-outline-success my-2 my-sm-0" onclick="confirmCategory()">确定</button>
+                        <button id="confirm-category-btn" class="btn btn-outline-danger my-2 my-sm-0" onclick="cancelCategory()">取消</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label>文章标签</label>
+        <div class="tags-div">
+            <div class="tags-btn-div">
+            {% for tag in tags %}
+                <button id="tag-{{tag[0]}}" class="btn btn-outline-primary" onclick="chooseTag({{tag[0]}})">{{tag[1]}}</button>
+            {% endfor %}
+            </div>
+            <div style="margin-left: 6px;">
+                <button id="add-tag-btn" class="btn btn-outline-primary" onclick="addTag()">+</button>
+                <div id="add-tag-form-div" style="display: none">
+                    <input id="tag-input" class="form-control mb-2" style="width: 100px; display: inline">
+                    <div id="not-login-in-div" class="btn-group">
+                        <button id="cancel-tag-btn" class="btn btn-outline-success my-2 my-sm-0" onclick="confirmTag()">确定</button>
+                        <button id="confirm-tag-btn" class="btn btn-outline-danger my-2 my-sm-0" onclick="cancelTag()">取消</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <button class="btn btn-primary btn-lg" style="padding-left: 60px; padding-right: 60px;" onclick="submit()">更新</button>
+</div>
+{% endblock %}
+
+{% block script %}
+var selected_category = {{blog[4]}}
+var selected_tags = {{blog[5]}}
+
+$().ready(function() {
+    $("#category-"+selected_category).removeClass("btn-outline-primary").addClass("btn-primary")
+    for (var i = 0; i < selected_tags.length; i++) {
+        $("#tag-" + selected_tags[i]).removeClass("btn-outline-primary").addClass("btn-primary")
+    }
+})
+
+function chooseCategory(id) {
+    $("#category-"+selected_category).removeClass("btn-primary").addClass("btn-outline-primary")
+    
+    if (selected_category != id) {
+        selected_category = id
+        $("#category-"+selected_category).removeClass("btn-outline-primary").addClass("btn-primary") 
+    } else {
+        selected_category = "0"
+    }
+}
+
+function chooseTag(id) {
+    console.log(selected_tags.indexOf(id))
+    if (selected_tags.indexOf(id) != -1) {
+        $("#tag-"+id).removeClass("btn-primary").addClass("btn-outline-primary")
+        selected_tags.splice(selected_tags.indexOf(id), 1)
+    } else {
+        selected_tags.push(id)
+        $("#tag-"+id).removeClass("btn-outline-primary").addClass("btn-primary")  
+    }
+    console.log(selected_tags)
+}
+
+function addCategory() {
+    $("#add-category-btn").hide()
+    $("#add-category-form-div").show()
+}
+
+function cancelCategory() {
+    $("#add-category-btn").show()
+    $("#add-category-form-div").hide() 
+}
+
+function addTag() {
+    $("#add-tag-btn").hide()
+    $("#add-tag-form-div").show()
+}
+
+function cancelTag() {
+    $("#add-tag-btn").show()
+    $("#add-tag-form-div").hide()  
+}
+
+function confirmCategory() {
+    category_name = $("#category-input").val()
+    $.ajax({
+        type: "POST",
+        url: "/addcategory",
+        data: {
+            name: category_name,
+        },
+        dataType: "json",
+        async: true,
+        success: function(data) {
+            if (data["status"] == "success") {
+                html = '<button id="category-' + data["category_id"] + '" class="btn btn-outline-primary" onclick="chooseCategory(' + data["category_id"] + ')">' + category_name + '</button>'
+                console.log(html)
+                $(".categories-btn-div").append(html)
+                cancelCategory()
+            }
+        }
+    })
+}
+
+function confirmTag() {
+    tag_name = $("#tag-input").val()
+    $.ajax({
+        type: "POST",
+        url: "/addtag",
+        data: {
+            name: tag_name,
+        },
+        dataType: "json",
+        async: true,
+        success: function(data) {
+            if (data["status"] == "success") {
+                html = '<button id="tag-' + data["tag_id"] + '" class="btn btn-outline-primary" onclick="chooseTag(' + data["tag_id"] + ')">' + tag_name + '</button>' 
+                $(".tags-btn-div").append(html)
+                cancelTag()
+            }
+        }
+    })
+}
+
+function submit() {
+    title = $("#title-input").val()
+    content = $("#content-input").val()
+    author_id = getCookie("userid")
+    console.log(title)
+    console.log(content)
+    console.log(selected_category)
+    console.log(selected_tags)
+    $.ajax({
+        type: "POST",
+        url: "/editblog/{{blog[0]}}",
+        traditional: true,
+        data: {
+            author_id: author_id,
+            title: title,
+            content: content,
+            category: selected_category,
+            tags: selected_tags,
+        },
+        dataType: "json",
+        async: true,
+        success: function(data) {
+            if (data["status"] == "success") {
+                toastr.success("更新成功，3s 后返回首页")
+                setTimeout(function() {
+                    window.location.href = "/myblog?author_id=" + getCookie("userid")
+                }, 3000)
+            }
+        }
+    })
+}
+{% endblock  %}
+
+{% block style %}
+.categories-div {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+}
+
+.tags-div {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+}
+
+.new-blog-form {
+    width: 70%;
+    padding: 16px;
+    margin-top: 50px;
+    margin-left: 15%;
+    border: 1px solid #f2f2f2;
+    border-radius: 16px;
+}
+{% endblock %}

@@ -1,0 +1,43 @@
+create table users (
+    id number(10) generated always as identity,
+    username varchar2(100) not null,
+    password varchar2(100) not null,
+    constraint con_username unique (username)
+);
+
+create table category (
+    id number(10) generated always as identity,
+    name varchar2(100) not null,
+    constraint con_category_name unique (name)
+);
+
+create table tag (
+    id number(10) generated always as identity,
+    name varchar2(100) not null,
+    constraint con_tag_name unique (name)
+);
+
+create table blog_tag (
+    id number(10) generated always as identity,
+    blog_id number(10) not null,
+    tag_id number(10) not null
+);
+
+create table blog (
+    id number(10) generated always as identity,
+    author_id number(10) not null,
+    category_id number(10),
+    title varchar2(100) not null,
+    content varchar2(4000) not null,
+    created_at date,
+    edited_at date
+);
+
+create table comments (
+    id number(10) generated always as identity,
+    author_id number(10),
+    blog_id number(10),
+    content varchar2(4000) not null,
+    created_at date,
+    edited_at date
+);

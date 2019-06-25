@@ -1,0 +1,124 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://cdn.bootcss.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" type="text/css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <title>Document</title>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
+            <a class="navbar-brand" href="#">博客</a>
+            <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+            <li class="nav-item">
+                <a class="nav-link" href="/categories">分类</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/tags">标签</a>
+            </li>
+            </ul>
+            <div id="nav-right-div" class="btn-group">
+                <div id="login-in-div" style="display: flex; flex-direction: row">
+                    <button class="btn btn-outline-primary" id="add-post-btn">+ 添加新文章</button>
+                    <div class="dropdown">
+                        <button class="btn dropdown-toggle" type="button" id="username-dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            
+                        </button>
+                        <div class="dropdown-menu" style="right: 0; left: auto" aria-labelledby="dropdownMenuButton">
+                            <button id="signout-btn" class="dropdown-item" type="button">注销</button>
+                            <button id="myblogs-btn" class="dropdown-item" type="button">我的文章</button>
+                        </div>
+                    </div>
+                </div>
+                <div id="not-login-in-div" class="btn-group">
+                    <button id="signin-btn" class="btn btn-outline-primary my-2 my-sm-0">登陆</button>
+                    <button id="signup-btn" class="btn btn-outline-success my-2 my-sm-0">注册</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+    {% block body %}
+    
+    {% endblock  %}
+</body>
+<script>
+{% block script %}
+
+{% endblock  %}
+if (document.body.clientWidth < 800) {
+    toastr.options.positionClass = "toast-top-full-width"
+} else {
+    toastr.options.positionClass = "toast-top-center"
+}
+
+var cookie_username = getCookie("username")
+
+$().ready(function() {
+    if (cookie_username != "") {
+        $("#login-in-div").show()
+        $("#not-login-in-div").hide()
+        $("#username-dropdown").text(cookie_username)
+    } else {
+        $("#login-in-div").hide()
+        $("#not-login-in-div").show()
+    }
+})
+
+$("#signin-btn").click(function() {
+    window.location.href = "/signin"
+})
+
+$("#signup-btn").click(function() {
+    window.location.href = "/signup"
+})
+
+$("#signout-btn").click(function() {
+    setCookie("username", "", -1)
+    setCookie("userid", "", -1)
+    window.location.href = "/"
+})
+
+$("#myblogs-btn").click(function() {
+    window.location.href = "/myblog?author_id=" + getCookie("userid")
+})
+
+$("#add-post-btn").click(function() {
+    window.location.href = "/newblog"
+})
+
+function setCookie(cname, cvalue, exdays) {
+    var d = new Date();
+    d.setTime(d.getTime() + (exdays*24*60*60*1000));
+    var expires = "expires="+d.toUTCString();
+    document.cookie = cname + "=" + cvalue + "; " + expires;
+}
+
+function getCookie(cname) {
+    var name = cname + "=";
+    var ca = document.cookie.split(';');
+    for(var i=0; i<ca.length; i++) {
+        var c = ca[i].trim();
+        if (c.indexOf(name)==0) return c.substring(name.length,c.length);
+    }
+    return "";
+}
+</script>
+<style>
+{% block style %}
+
+{% endblock %}
+html, body {
+    width: 100%;
+    height: 100%;
+}
+</style>
+</html>

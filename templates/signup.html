@@ -1,0 +1,109 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://cdn.bootcss.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" type="text/css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <title>Document</title>
+</head>
+<body>
+    <div class="signup-form-div">
+        <h2>注册</h2>
+        <div class="signup-form">
+            <div class="form-group">
+                <label for="exampleInputEmail1">用户名</label>
+                <input id="username-input" name="username" type="text" class="form-control" placeholder="用户名">
+                <small class="form-text text-muted">您的用户名将在文章中显示</small>
+            </div>
+            <div class="form-group">
+                <label for="exampleInputPassword1">密码</label>
+                <input id="password-input" name="password" type="password" class="form-control" id="exampleInputPassword1" placeholder="密码">
+            </div>
+            <div class="form-group">
+                <label for="exampleInputPassword1">确认密码</label>
+                <input id="password-repeat-input" name="password-repeat" type="password" class="form-control" id="exampleInputPassword1" placeholder="再次输入密码">
+            </div>
+            <button id="signup-btn" class="btn btn-primary btn-block">注册</button>
+        </div>
+    </div>
+</body>
+<script>
+    function setCookie(cname, cvalue, exdays) {
+        var d = new Date();
+        d.setTime(d.getTime() + (exdays*24*60*60*1000));
+        var expires = "expires="+d.toUTCString();
+        document.cookie = cname + "=" + cvalue + "; " + expires;
+    }
+
+    $("#signup-btn").click(function() {
+        username = $("#username-input").val()
+        password = $("#password-input").val()
+        password_repeat = $("#password-repeat-input").val()
+        if (username == "") {
+            toastr.error("用户名不能为空")
+            return
+        }
+        if (password.length < 6) {
+            toastr.error("密码太短，请大于 6 位")
+        }
+        if (password != password_repeat) {
+            toastr.error("两次输入密码不同")
+            return
+        }
+        $.ajax({
+            type: "POST",
+            url: "/signup",
+            data: {
+                username: username,
+                password: password,
+            },
+            dataType: "json",
+            async: true,
+            success: function(data) {
+                if (data["status"] == "success") {
+                    setCookie("username", username, 30)
+                    setCookie("userid", data["user_id"], 30)
+                    toastr.success("注册成功, 3s 后返回首页")
+                    setTimeout(function() {
+                        window.location.href = "/"
+                    }, 3000)
+                } else if (data["status"] == "failed") {
+                    toastr.error(data["error_msg"])
+                }
+            }
+        })
+    })
+</script>
+</html>
+
+<style>
+    html, body {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .signup-form-div {
+        width: 30%;
+        min-height: 40%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-around;
+        border: 1px solid #f2f2f2;
+        border-radius: 16px;
+        padding: 12px;
+    }
+
+    .signup-form {
+        width: 60%;
+    }
+</style>

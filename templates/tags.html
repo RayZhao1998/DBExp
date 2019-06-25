@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block body %}
+<div class="tags-div">
+    <h3>所有分类</h3>
+    {% for tag in tags %}
+        {% if tag[0] == selected_tag %}
+            <button class="btn btn-primary" onclick="chooseCategory({{tag[0]}})">{{tag[1]}}</button> 
+        {% else %}
+            <button class="btn btn-outline-primary" onclick="chooseCategory({{tag[0]}})">{{tag[1]}}</button> 
+        {% endif %}
+    {% endfor %}
+    <hr>
+</div>
+
+
+    {% for blog in blogs %}
+        <div id="blog-card-{{blog[0]}}" class="card">
+            <div class="card-body">
+                <h5 class="card-title">{{blog[2]}}</h5>
+                <h6 class="card-subtitle mb-2 text-muted">作者：{{blog[1]}}</h6>
+                <p class="card-text">{{blog[3]}}</p>
+                <div style="display: flex; flex-direction: row">
+                    <a href="/blog/{{blog[0]}}" class="btn btn-primary">阅读更多</a>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+{% endblock body %}
+
+{% block script %}
+function chooseCategory(id) {
+    window.location.href="/tags/"+id
+}
+{% endblock script %}
+
+{% block style %}
+.tags-div, .card {
+    width: 70%;
+    margin-left: 15%;
+    margin-top: 30px;
+}
+{% endblock style %}

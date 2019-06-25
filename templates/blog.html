@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block body %}
+<div class="blog-div">
+    <h2>{{blog[2]}}</h2>
+    <h5>@ {{blog[1]}}</h5>
+    <hr>
+    <p>{{blog[3]|safe}}<p>
+    <hr>
+    <div class="card">
+        <div class="card-body">
+            <h3 class="card-title">评论</h3>
+            {% if blog[6]|length == 0 %}
+                <p class="card-text" id="no-comment-p">还没有人评论</p>
+            {% else %}
+            {% endif %}
+            <div id="comment-div">
+            {% for comment in blog[6] %}
+                <p class="card-text">{{comment[0]}}: {{comment[1]}}</p>
+            {% endfor %}
+            </div>
+            <input id="comment-input" class="form-control mb-2">
+            <button class="btn btn-primary" onclick="addcomment()">添加评论</button>
+        </div>
+    </div>
+</div>
+{% endblock body %}
+
+{% block script %}
+function addcomment() {
+    content = $("#comment-input").val()
+    author_id = getCookie("userid")
+    $.ajax({
+        type: "POST",
+        url: "/addcomment",
+        data: {
+            author_id: author_id,
+            blog_id: {{blog[0]}},
+            content: content,
+        },
+        dataType: "json",
+        async: true,
+        success: function(data) {
+            if (data["status"] == "success") {
+                if ({{blog[6]|length}} == 0) {
+                    $("#no-comment-p").remove()
+                }
+                $("#comment-div").append('<p class="card-text">' + getCookie("username") + ': ' + content + '</p>')
+                $("#comment-input").val("")
+            }
+        }
+    })
+}
+{% endblock script %}
+
+{% block style %}
+.blog-div {
+    width: 70%;
+    margin-left: 15%;
+    margin-top: 30px;
+}
+{% endblock style %}
