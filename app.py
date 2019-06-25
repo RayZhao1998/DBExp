@@ -196,7 +196,14 @@ def categories(id=0):
 		return render_template("categories.html", categories=select_result) 
 	else:
 		sql = "select * from blog where category_id=" + str(id)
-		result = sql_select_execute(sql)	
+		blogs = sql_select_execute(sql)
+		result = []
+		for blog in blogs:
+			id=blog[0]
+			title = blog[3]
+			author = sql_select_execute("select * from users where id=" + str(blog[1]))[0][1]
+			content = blog[4][0:100] + "..."
+			result.append((id, author, title, content))
 		return render_template("categories.html", categories=select_result, selected_category=id, blogs=result)
 
 @app.route('/tags')
@@ -207,7 +214,14 @@ def tags(id=0):
 		return render_template("tags.html", tags=select_result)
 	else:
 		sql = "select blog.* from blog, blog_tag where blog.id=blog_tag.blog_id and blog_tag.tag_id=" + str(id)
-		result = sql_select_execute(sql)
+		blogs = sql_select_execute(sql)
+		result = []
+		for blog in blogs:
+			id=blog[0]
+			title = blog[3]
+			author = sql_select_execute("select * from users where id=" + str(blog[1]))[0][1]
+			content = blog[4][0:100] + "..."
+			result.append((id, author, title, content))
 		return render_template("tags.html", tags=select_result, selected_tag=id, blogs=result)
 
 def sql_insert_execute(sql):
