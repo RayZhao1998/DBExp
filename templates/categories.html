@@ -15,13 +15,13 @@
 
 
     {% for blog in blogs %}
-        <div id="blog-card-{{blog[0]}}" class="card">
+        <div id="blog-card-{{blog[1]}}" class="card">
             <div class="card-body">
-                <h5 class="card-title">{{blog[2]}}</h5>
-                <h6 class="card-subtitle mb-2 text-muted">作者：{{blog[1]}}</h6>
-                <p class="card-text">{{blog[3]}}</p>
+                <h5 class="card-title">{{blog[3]}}</h5>
+                <h6 class="card-subtitle mb-2 text-muted">作者：{{blog[2]}}</h6>
+                <p class="card-text">{{blog[4]}}</p>
                 <div style="display: flex; flex-direction: row">
-                    <a href="/blog/{{blog[0]}}" class="btn btn-primary">阅读更多</a>
+                    <a href="/blog/{{blog[1]}}" class="btn btn-primary">阅读更多</a>
                 </div>
             </div>
         </div>
